@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Book from './Book.jsx';
 import { Link } from 'react-router-dom';
-import {BookmarkStar} from 'react-bootstrap-icons';
+import { BookmarkStar } from 'react-bootstrap-icons';
 
 const ListBooks = () => {
    const [books, setBooks] = useState([]);
@@ -22,9 +22,14 @@ const ListBooks = () => {
             <div className='row mt-4'>
                {books.length > 0 ? (
                   books.map((book) => (
-                     <div className='col-md-6 col-lg-4 mb-3 d-flex flex-column' key={book.id}>
+                     <div
+                        className='col-md-6 col-lg-4 mb-3 d-flex flex-column'
+                        key={book.id}
+                     >
                         <Book title={book.title} category={book.category} />
-                        <Link className='btn btn-primary mt-1 align-self-center'><BookmarkStar/> Emprunter</Link>
+                        <Link className='btn btn-primary mt-1 align-self-center mt-2'>
+                           <BookmarkStar /> Emprunter
+                        </Link>
                      </div>
                   ))
                ) : (
