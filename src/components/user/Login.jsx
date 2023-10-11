@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Api } from '../../config/Api.js';
+import { AUTH_TOKEN_KEY } from '../../App.jsx';
+import { toast } from 'react-toastify';
 
-const Login = () => {
+const Login = ({ setUserInfo }) => {
+   const navigate = useNavigate();
    const [userData, setUserData] = useState({
       email: '',
       password: '',
@@ -9,7 +13,20 @@ const Login = () => {
 
    const onSubmit = (e) => {
       e.preventDefault();
-      console.log(4, userData);
+      Api.post('/authenticate', { ...userData })
+         .then((res) => {
+            const bearerToken = res?.data?.accessToken;
+            if (bearerToken && bearerToken.slice(0, 7) === 'Bearer ') {
+               // const jwt = bearerToken.slice(7, bearerToken.length);
+               localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(res.data));
+               setUserInfo(`${res.data?.firstName} ${res.data?.lastName}`);
+            }
+            toast.success('Vous avez été connecté avec succès !');
+            navigate('/myBooks');
+         })
+         .catch((e) => {
+            toast.error('Authentification erronée !');
+         });
    };
 
    const handleChange = (e) => {
@@ -47,15 +64,19 @@ const Login = () => {
                         onChange={handleChange}
                      />
                   </div>
-                  <button type='submit' className='btn btn-primary'>
-                     Se connecter
-                  </button>
+                  <div className='d-flex justify-content-between'>
+                     <button type='submit' className='btn btn-primary'>
+                        Se connecter
+                     </button>
+                     <div>
+                        {' '}
+                        Pas encore inscrit ?
+                        <Link className='btn btn-primary ms-2' to='/addUser'>
+                           M'inscrire
+                        </Link>
+                     </div>
+                  </div>
                </form>
-               <div className='text-center mt-4'>
-                  <Link className='btn btn-primary' to='/addUser'>
-                     M'inscrire
-                  </Link>
-               </div>
             </div>
          </div>
       </div>

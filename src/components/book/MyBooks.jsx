@@ -2,20 +2,26 @@ import React, { useEffect, useState } from 'react';
 import Book from './Book.jsx';
 import { Link } from 'react-router-dom';
 import { PencilSquare, Trash, BookFill } from 'react-bootstrap-icons';
+import { Api } from '../../config/Api.js';
+import { toast } from 'react-toastify';
 
 const MyBooks = () => {
    const [books, setBooks] = useState([]);
-
-   const array = [
-      { id: 1, title: 'Les berbères du Maghreb', category: 'Roman' },
-      { id: 2, title: "L'espoir assassiné", category: 'Roman' },
-      { id: 3, title: "L'espoir assassiné", category: 'Roman' },
-      { id: 4, title: "L'espoir assassiné", category: 'Roman' },
-   ];
    useEffect(() => {
-      setBooks(array);
+      Api.get('/books').then((res) => {
+         setBooks(res.data);
+      });
    }, []);
-
+   const handleDelete = (bookId) => {
+      if (confirm('Etes-vous certain de vouloir supprimer ce livre?')) {
+         Api.delete(`/books/${bookId}`)
+            .then((res) => {
+               toast.success('Le livre a bien été supprimé !');
+               setBooks(books.filter((book) => book.id !== bookId));
+            })
+            .catch((e) => toast.error(e.response.data));
+      }
+   };
    return (
       <>
          <div className='container'>
@@ -32,7 +38,11 @@ const MyBooks = () => {
                         className='col-sm-12 col-md-6 col-lg-4 d-flex flex-column mb-5'
                         key={book.id}
                      >
-                        <Book title={book.title} category={book.category} />
+                        <Book
+                           title={book.title}
+                           category={book.category.label}
+                           status={book.status}
+                        />
                         <div className='mt-2 text-center'>
                            <Link
                               to={`/addBook/${book.id}`}
@@ -40,7 +50,10 @@ const MyBooks = () => {
                            >
                               <PencilSquare /> Modifier
                            </Link>
-                           <Link className='btn btn-danger'>
+                           <Link
+                              className='btn btn-danger'
+                              onClick={(e) => handleDelete(book.id)}
+                           >
                               <Trash /> Supprimer
                            </Link>
                         </div>

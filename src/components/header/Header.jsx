@@ -1,14 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { AUTH_TOKEN_KEY } from '../../App.jsx';
+import { toast } from 'react-toastify';
 
-const Header = () => {
+const Header = ({ userInfo, setUserInfo }) => {
+   const navigate = useNavigate();
+   const signout = () => {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      setUserInfo(null);
+      toast.error('Vous avez été déconnecté !');
+      navigate('/login');
+   };
+
    return (
       <div>
          <nav className='navbar navbar-expand-lg bg-body-tertiary'>
             <div className='container-fluid'>
-               <a className='navbar-brand' href='#'>
+               <Link className='navbar-brand' to='/listBooks'>
                   ShareBook
-               </a>
+               </Link>
                <button
                   className='navbar-toggler'
                   type='button'
@@ -46,8 +56,10 @@ const Header = () => {
                      </li>
                   </ul>
                   <div className='d-flex flex-column align-items-sm-start flex-lg-row align-items-lg-center'>
-                     <div className='mb-sm-3 mb-lg-1 me-2'>Bienvenue ...</div>
-                     <button className='btn btn-secondary'>
+                     <div className='mb-sm-3 mb-lg-1 me-2'>
+                        Bienvenue {userInfo}
+                     </div>
+                     <button className='btn btn-secondary' onClick={signout}>
                         Se déconnecter
                      </button>
                   </div>

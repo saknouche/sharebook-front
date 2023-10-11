@@ -1,34 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import Borrow from './Borrow.jsx';
+import { Api } from '../../config/Api.js';
+import { toast } from 'react-toastify';
 
 const MyBorrows = () => {
    const [myBorrows, setMyBorrows] = useState([]);
+   const getMyBorrows = () => {
+      Api.get('/borrows')
+         .then((res) => {
+            setMyBorrows(res.data)
+         })
+         .catch((e) => toast.error(e.response.data))
+   }
    useEffect(() => {
-      setMyBorrows([
-         {
-            id: 1,
-            lender: {
-               firstName: 'sadev',
-               lastName: 'root',
-            },
-            borrower: {
-               firstName: 'vini',
-               lastName: 'jr',
-            },
-            book: {
-               name: 'Moby Dick',
-               category: {
-                  label: 'Roman',
-               },
-            },
-            askDate: '',
-            closeDate: '',
-         }
-      ]);
+      getMyBorrows();
    }, []);
 
    const closeBorrow = (borrowId) => {
-      console.log(borrowId);
+      Api.delete(`/borrows/${borrowId}`)
+         .then((res) => {
+            getMyBorrows();
+            toast.success(res.data);
+         })
+         .catch((e) => toast.error(e.response.data))
    };
    return (
       <div className='container'>
@@ -54,7 +48,7 @@ const MyBorrows = () => {
                   </div>
                ))
                ):(
-                <div className='alert alert-danger w-100'>Vous n'avez pas d'emprunts !</div>
+                <div>Vous n'avez pas d'emprunts !</div>
                )}
             </div>
          </div>
